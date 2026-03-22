@@ -5,7 +5,7 @@
 
 // 1. 初始化 Supabase 连接
 const SUPABASE_URL = 'https://imjdfpywvsnenxfxxglg.supabase.co'; 
-const SUPABASE_KEY = 'sb_publishable_-NvzWA-j2TXGILOPPewF5Q_OdKhn7fJv5XAnmKBy9-5_v1fA7uWqV6t7Zp6A_7-7'; 
+const SUPABASE_KEY = 'sb_publishable_-NvzWA-j2TXGILOPPewF5Q_OdKhnr-s; 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 2. 渲染登录页面
