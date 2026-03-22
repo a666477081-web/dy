@@ -3,21 +3,7 @@
    Resource Atlas | DYFTZ
 ════════════════════════════════════════ */
 
-function buildDemoList(){
-  $('demoL').innerHTML = STATE.users.filter(u=>u.approved).slice(0,3).map(u=>
-    `<div class="demo-item" onclick="fillCreds('${u.un}','${u.pw}')">
-      <span class="demo-item__name">${u.name}</span>
-      <span style="font-size:9px;color:${rc(u.role)};margin-left:5px">[${rl(u.role)}]</span>
-      <div class="demo-item__creds u-mono">${u.un} / ${u.pw}</div>
-    </div>`
-  ).join('') + `<div class="demo-hint">↑ 点击账号自动填入</div>`;
-}
 
-function fillCreds(u,p){
-  const a=$('li-un'), b=$('li-pw');
-  if(a) a.value=u;
-  if(b) b.value=p;
-}
 
 function renderLogin(){
   $('lf').innerHTML=`
