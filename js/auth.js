@@ -4,7 +4,7 @@
 ════════════════════════════════════════ */
 
 // 1. 初始化 Supabase 连接
-const SUPABASE_URL = 'https://imjdfpywvsnenxfxxglg.supabase.co'; 
+const SUPABASE_URL = 'https://imjdfpywvsnenxfxxglg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltamRmcHl3dnNuZW54Znh4Z2xnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODczMTIsImV4cCI6MjA4OTc2MzMxMn0.oq7qZrS5_KK30H7PWWwErL-Evy6FcE4-U_V-VuTtCY8';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -56,7 +56,7 @@ async function doLogin(){
   }
 
   e.classList.remove('show');
-  STATE.cu = user; 
+  STATE.cu = user;
   showApp();
 }
 
@@ -67,16 +67,24 @@ async function doReg(){
         pw2=($('r-pw2').value||'').trim(), org=($('r-org').value||'').trim();
   const e=$('r-err'), ok=$('r-ok'), btn=$('r-btn');
 
-  if(!un||!name||!email||!pw){ showAlert(e,'请填写所有必填项'); return; }
-  if(pw!==pw2){ showAlert(e,'两次密码不一致'); return; }
+  if(!un || !name || !email || !pw){ showAlert(e,'请填写所有必填项'); return; }
+  if(pw !== pw2){ showAlert(e,'两次密码不一致'); return; }
 
   btn.disabled = true; btn.textContent = '提交中...';
 
-  // 使用初始化好的 sb 客户端插入
+  // 使用初始化好的 sb 客户端插入，并补全 email 和 org 字段
   const { error } = await sb
     .from('users')
     .insert([
-      { username: un, password: pw, name: name, role: 'editor', approved: false }
+      {
+        username: un,
+        password: pw,
+        name: name,
+        email: email,
+        org: org,
+        role: 'editor',
+        approved: false
+      }
     ]);
 
   if(error){
