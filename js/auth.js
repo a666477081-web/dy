@@ -40,7 +40,7 @@ async function doLogin(){
     .select('*')
     .eq('username', un)
     .eq('password', pw)
-    .single();
+   .maybeSingle();
 
   if(error || !user){
     showAlert(e, '用户名或密码错误');
