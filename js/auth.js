@@ -5,7 +5,7 @@
 
 // 1. 初始化 Supabase 连接
 const SUPABASE_URL = 'https://imjdfpywvsnenxfxxglg.supabase.co'; 
-const SUPABASE_KEY = 'sb_publishable_-NvzWA-j2TXGILOPPewF5Q_OdKhn7fJv5XAnmKBy9-5_v1fA7uWqV6t7Zp6A_7-7';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltamRmcHl3dnNuZW54Znh4Z2xnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODczMTIsImV4cCI6MjA4OTc2MzMxMn0.oq7qZrS5_KK30H7PWWwErL-Evy6FcE4-U_V-VuTtCY8';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 2. 渲染登录页面
