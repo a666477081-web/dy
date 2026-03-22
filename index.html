@@ -1,11 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>欢迎访问我的公司网站</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DYFTZ 资源图谱管理系统 — 全球资源整合与 AI 智能匹配平台">
+  <title>Resource Atlas · 资源图谱 | DYFTZ</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
 </head>
 <body>
-    <h1>GitHub Pages 部署成功！</h1>
-    <p>这是我们公司网站的初始版本，正在加载中...</p>
+
+  <!-- ═══ LOGIN VIEW ═══ -->
+  <div id="lv" class="login-view">
+    <div class="login-panel">
+      <div class="brand-mark">◈ Resource Atlas</div>
+      <h1 class="brand-title">资源图谱<br>管理系统 <span class="ai-tag">AI</span></h1>
+      <p class="brand-sub">全球资源整合 · AI 智能匹配<br>多权限管理平台 v4</p>
+
+      <div class="demo-box">
+        <div class="demo-box__label">演示账号（点击填入）</div>
+        <div id="demoL"></div>
+      </div>
+
+      <div class="ai-info-box">
+        <div class="ai-info-box__title">✦ AI 每日配额</div>
+        <div class="ai-info-box__body">普通用户 10 次/天<br>VIP 用户 50 次/天<br>管理员 无限制</div>
+      </div>
+
+      <div class="login-footer-note">
+        注册须管理员审核 · 联系方式加密保护<br>
+        每条资源设有效期 · 到期提醒重新审核
+      </div>
+    </div>
+
+    <div class="login-form-wrap">
+      <div id="lf" class="login-form-inner"></div>
+    </div>
+  </div>
+
+  <!-- ═══ APP VIEW ═══ -->
+  <div id="av" class="app-view" style="display:none">
+    <header id="hdr" class="app-header"></header>
+    <aside id="sb" class="app-sidebar"></aside>
+    <main class="app-map-wrap"><div id="map"></div></main>
+    <section id="dp" class="detail-panel"><div id="dpc" class="detail-panel__inner"></div></section>
+    <div id="mo" class="modal-overlay"><div id="mbox" class="modal-box"></div></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/resources.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
