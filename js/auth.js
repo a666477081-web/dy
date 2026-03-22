@@ -3,10 +3,10 @@
    Resource Atlas | DYFTZ
 ════════════════════════════════════════ */
 
-// 1. 初始化 Supabase 连接 (请填入您的真实信息)
-const SUPABASE_URL = 'https://imjdfpywvsnenxfxxglg.supabase.co';
-const SUPABASE_KEY = '这里填入您在截图里看到的那个很长的 anon public key';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// 1. 初始化 Supabase 连接
+const SUPABASE_URL = 'https://imjdfpywvsnenxfxxglg.supabase.co'; 
+const SUPABASE_KEY = 'sb_publishable_-NvzWA-j2TXGILOPPewF5Q_OdKhn7fJv5XAnmKBy9-5_v1fA7uWqV6t7Zp6A_7-7'; 
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 2. 渲染登录页面
 function renderLogin(){
@@ -26,7 +26,7 @@ function renderLogin(){
     </div>`;
 }
 
-// 3. 执行登录逻辑 (从云端读取)
+// 3. 执行登录逻辑
 async function doLogin(){
   const un=($('li-un').value||'').trim(), pw=($('li-pw').value||'').trim();
   const e=$('li-err'), btn=$('login-btn');
@@ -34,8 +34,8 @@ async function doLogin(){
 
   btn.disabled = true; btn.textContent = '验证中...';
 
-  // 【核心修改】：从 Supabase 数据库查询用户
-  const { data: user, error } = await supabase
+  // 使用初始化好的 sb 客户端查询
+  const { data: user, error } = await sb
     .from('users')
     .select('*')
     .eq('username', un)
@@ -56,11 +56,11 @@ async function doLogin(){
   }
 
   e.classList.remove('show');
-  STATE.cu = user; // 将云端获取的用户信息存入系统状态
+  STATE.cu = user; 
   showApp();
 }
 
-// 4. 执行注册逻辑 (写入云端)
+// 4. 执行注册逻辑
 async function doReg(){
   const un=($('r-un').value||'').trim(), name=($('r-name').value||'').trim(),
         email=($('r-email').value||'').trim(), pw=($('r-pw').value||'').trim(),
@@ -72,8 +72,8 @@ async function doReg(){
 
   btn.disabled = true; btn.textContent = '提交中...';
 
-  // 【核心修改】：插入数据到 Supabase
-  const { error } = await supabase
+  // 使用初始化好的 sb 客户端插入
+  const { error } = await sb
     .from('users')
     .insert([
       { username: un, password: pw, name: name, role: 'editor', approved: false }
@@ -81,11 +81,12 @@ async function doReg(){
 
   if(error){
     showAlert(e, '注册失败：' + error.message);
-    btn.disabled = false;
+    btn.disabled = false; btn.textContent = '提交申请';
   } else {
     ok.innerHTML='✓ 注册申请已提交成功，请等待审核';
     ok.classList.add('show');
     e.classList.remove('show');
+    btn.style.display = 'none';
   }
 }
 
@@ -105,6 +106,7 @@ function renderReg(){
         <div><label class="lbl">密码 *</label><input class="fi" id="r-pw" type="password"></div>
         <div><label class="lbl">确认密码 *</label><input class="fi" id="r-pw2" type="password"></div>
       </div>
+      <div><label class="lbl">机构 / 申请用途</label><textarea class="fi" id="r-org" rows="2" placeholder="机构名称及申请用途..."></textarea></div>
       <div id="r-err" class="alert alert-error"></div>
       <div id="r-ok" class="alert alert-success"></div>
       <button class="btn btn-primary u-full-width" id="r-btn" onclick="doReg()">提交申请</button>
@@ -116,8 +118,12 @@ function renderReg(){
 
 function doLogout(){
   STATE.cu=null;
-  $('av').style.display='none'; $('lv').style.display='flex';
+  $('av').style.display='none'; 
+  $('lv').style.display='flex';
   renderLogin();
 }
 
-function showAlert(el, msg){ el.textContent=msg; el.classList.add('show'); }
+function showAlert(el, msg){ 
+  el.textContent=msg; 
+  el.classList.add('show'); 
+}
