@@ -23,7 +23,7 @@ const ROLES = {
 
 /* ── Demo Users ── */
 let DEMO_USERS = [
-  { id:'u1', un:'admin',    pw:'admin888', role:'admin',  name:'系统管理员',  email:'admin@dyftz.com',    tel:'',            org:'DYFTZ平台',   approved:true,  reg:'2024-01-01' },
+  { id:'u1', un:'admin',    pw:'159357abc', role:'admin',  name:'系统管理员',  email:'admin@dyftz.com',    tel:'',            org:'DYFTZ平台',   approved:true,  reg:'2024-01-01' },
   { id:'u2', un:'vip001',   pw:'vip888',   role:'vip',    name:'李总监',      email:'li@example.com',     tel:'+86-138xxxx', org:'东方美食集团', approved:true,  reg:'2024-03-15' },
   { id:'u3', un:'user001',  pw:'user888',  role:'editor', name:'张资源专员',  email:'zhang@example.com',  tel:'+86-139xxxx', org:'供应链部门',   approved:true,  reg:'2024-05-20' },
   { id:'u4', un:'pending1', pw:'test888',  role:'editor', name:'王新申请',    email:'wang@test.com',      tel:'',            org:'合作洽谈方',   approved:false, reg:'2025-03-18' },
