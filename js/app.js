@@ -90,6 +90,5 @@ function buildSidebar(){
 
 /* ── Boot ── */
 document.addEventListener('DOMContentLoaded', () => {
-  buildDemoList();
   renderLogin();
 });
