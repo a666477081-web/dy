@@ -1,26 +1,31 @@
 /* ════════════════════════════════════════
-   CONFIG.JS — 全局配置与状态初始化
+   CONFIG.JS — 全局配置与状态初始化 (修复版)
 ════════════════════════════════════════ */
 
-// 全局配置参数
+// 1. 全局便捷工具函数（必须放在最前面！）
+function $(id) {
+  return document.getElementById(id);
+}
+
+// 2. 系统参数配置
 window.CONFIG = {
   FILE_MAX_MB: 10,
   FILES_PER_RES: 5
 };
 
-// 【核心】初始化全局状态机
+// 3. 初始化全局状态机
 window.STATE = {
-  resources: [],     // 云端抓取的资源列表
-  users: [],         // 用户列表
-  adding: false,     // 标注模式开关 (重要)
-  addLL: null,       // 临时存储地图点击的坐标
-  activeId: null,    // 当前选中的资源 ID
+  resources: [],
+  users: [],
+  adding: false,
+  addLL: null,
+  activeId: null,
   filterCats: new Set(),
-  cu: null,          // 当前登录的用户对象
-  pendFiles: []      // 待上传的附件
+  cu: null,
+  pendFiles: []
 };
 
-// 分类配置 (保持您的分类定义不变)
+// 4. 资源分类配置
 window.CATS = {
   'public': { l:'公共事务', c:'#3b82f6', b:'rgba(59,130,246,0.1)', defExp:'1y' },
   'biz':    { l:'商贸对接', c:'#10b981', b:'rgba(16,185,129,0.1)', defExp:'1y' },
