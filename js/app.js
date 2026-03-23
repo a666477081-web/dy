@@ -1,74 +1,67 @@
 /* ════════════════════════════════════════
-   APP.JS — 应用程序核心入口（完整修正版）
-   Resource Atlas | DYFTZ
+   APP.JS — 界面构建与初始化 (完整恢复版)
 ════════════════════════════════════════ */
 
-/**
- * 1. 当用户登录成功后，调用此函数启动整个应用界面
- */
 function showApp() {
-  console.log("正在启动应用界面...");
+  $('lv').style.display = 'none';
+  $('av').style.display = 'flex'; // 使用 flex 布局确保 UI 排版正常
 
-  // --- 视图切换 ---
-  const loginView = document.getElementById('lv');
-  const appView = document.getElementById('av');
-
-  if (loginView) loginView.style.display = 'none';
-  if (appView) appView.style.display = 'flex';
-
-  // --- 数据同步 ---
-  // 立即从 Supabase 云端抓取最新的资源数据
+  // 1. 同步云端资源
   if (typeof loadResourcesFromCloud === 'function') {
     loadResourcesFromCloud();
+  }
+
+  // 2. 渲染 UI 组件
+  buildHeader();
+  buildSidebar();
+
+  // 3. 初始化地图
+  if (!window.lMap) {
+    setTimeout(() => { initMap(); }, 100);
   } else {
-    console.error("错误：找不到 loadResourcesFromCloud 函数，请检查 resources.js 是否加载。");
-  }
-
-  // --- UI 渲染 ---
-  // 渲染顶部导航栏（包含资源统计和用户状态）
-  if (typeof buildHeader === 'function') {
-    buildHeader();
-  }
-
-  // 渲染侧边栏列表
-  if (typeof buildSidebar === 'function') {
-    buildSidebar();
-  }
-
-  // --- 地图初始化 ---
-  // 如果地图还未创建，则初始化；如果已存在，则刷新尺寸（防止渲染空白）
-  if (typeof initMap === 'function') {
-    if (!window.lMap) {
-      // 给浏览器一点渲染 DOM 的时间，100ms 后初始化地图
-      setTimeout(() => { 
-        initMap(); 
-        console.log("地图初始化完成");
-      }, 100);
-    } else {
-      // 解决 Leaflet 在隐藏容器显示时的尺寸 Bug
-      setTimeout(() => { 
-        window.lMap.invalidateSize(); 
-        console.log("地图尺寸已刷新");
-      }, 120);
-    }
+    setTimeout(() => { if (window.lMap) window.lMap.invalidateSize(); }, 120);
   }
 }
 
-/**
- * 2. 页面首次加载时的初始化逻辑
- */
-window.addEventListener('DOMContentLoaded', () => {
-  console.log("系统已就绪，等待登录...");
+// 渲染顶部导航
+function buildHeader() {
+  if (!STATE.cu) return;
+  const cu = STATE.cu;
   
-  // 默认渲染登录表单
-  if (typeof renderLogin === 'function') {
-    renderLogin();
-  }
+  // 这里的 HTML 决定了你顶部显示的按钮和文字
+  $('hdr').innerHTML = `
+    <div class="hdr-brand">◈ RESOURCE ATLAS <span class="ai-tag">AI</span></div>
+    <div class="hdr-spacer"></div>
+    <div class="u-flex u-items-center u-gap-md">
+      ${STATE.adding ? '<span class="adding-hint">请在地图上点击位置...</span>' : ''}
+      <button class="btn ${STATE.adding ? 'btn-amber' : 'btn-primary'}" onclick="startAdd()">
+        ${STATE.adding ? '取消标注' : '标注新资源'}
+      </button>
+      <div class="user-badge" onclick="doLogout()">
+        <span class="user-name">${cu.name}</span>
+        <span class="logout-icon">退出</span>
+      </div>
+    </div>
+  `;
+}
+
+// 渲染侧边栏框架
+function buildSidebar() {
+  $('sb').innerHTML = `
+    <div class="sb-search">
+      <input type="text" id="sinp" class="fi" placeholder="搜索资源名称..." oninput="renderList()">
+    </div>
+    <div id="chips-wrap" class="sb-chips"></div>
+    <div id="cnt" class="sb-count">正在同步云端数据...</div>
+    <div id="rlist" class="sb-list"></div>
+    <div class="sb-footer">DYFTZ 云端同步系统 v4.0</div>
+  `;
+  // 渲染分类过滤按钮
+  if (typeof renderChips === 'function') renderChips();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof renderLogin === 'function') renderLogin();
 });
 
-/**
- * 3. 辅助工具函数：快速获取 DOM 元素 (对应代码中的 $ 符号)
- */
-function $(id) {
-  return document.getElementById(id);
-}
+function $(id) { return document.getElementById(id); }
