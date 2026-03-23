@@ -3,20 +3,29 @@
    Resource Atlas | DYFTZ
 ════════════════════════════════════════ */
 // 当用户登录成功后，调用这个函数加载云端资源
+// 当用户登录成功后，调用此函数启动整个应用
 function showApp() {
-  $('lv').style.display='none'; 
-  $('av').style.display='flex';
-  
-  // 【新增这一行】
-  loadResourcesFromCloud(); 
-}
-function showApp(){
+  // 1. 切换界面视图
   $('lv').style.display = 'none';
-  $('av').style.display = 'block';
+  $('av').style.display = 'flex';
+
+  // 2. 【核心】从云端同步资源数据
+  if (typeof loadResourcesFromCloud === 'function') {
+    loadResourcesFromCloud();
+  }
+
+  // 3. 渲染顶部导航和侧边栏 UI
   buildHeader();
   buildSidebar();
-  if(!lMap){ setTimeout(()=>{ initMap(); }, 100); }
-  else { setTimeout(()=>{ if(lMap) lMap.invalidateSize(); }, 120); }
+
+  // 4. 初始化地图逻辑
+  if (!lMap) {
+    // 第一次打开，初始化地图
+    setTimeout(() => { initMap(); }, 100);
+  } else {
+    // 如果地图已存在，刷新尺寸防止显示错位
+    setTimeout(() => { if (lMap) lMap.invalidateSize(); }, 120);
+  }
 }
 
 /* ── Header ── */
