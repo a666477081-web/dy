@@ -1,110 +1,74 @@
 /* ════════════════════════════════════════
-   APP.JS — Application Shell · Header · Sidebar · Init
+   APP.JS — 应用程序核心入口（完整修正版）
    Resource Atlas | DYFTZ
 ════════════════════════════════════════ */
-// 当用户登录成功后，调用这个函数加载云端资源
-// 当用户登录成功后，调用此函数启动整个应用
-function showApp() {
-  // 1. 切换界面视图
-  $('lv').style.display = 'none';
-  $('av').style.display = 'flex';
 
-  // 2. 【核心】从云端同步资源数据
+/**
+ * 1. 当用户登录成功后，调用此函数启动整个应用界面
+ */
+function showApp() {
+  console.log("正在启动应用界面...");
+
+  // --- 视图切换 ---
+  const loginView = document.getElementById('lv');
+  const appView = document.getElementById('av');
+
+  if (loginView) loginView.style.display = 'none';
+  if (appView) appView.style.display = 'flex';
+
+  // --- 数据同步 ---
+  // 立即从 Supabase 云端抓取最新的资源数据
   if (typeof loadResourcesFromCloud === 'function') {
     loadResourcesFromCloud();
-  }
-
-  // 3. 渲染顶部导航和侧边栏 UI
-  buildHeader();
-  buildSidebar();
-
-  // 4. 初始化地图逻辑
-  if (!lMap) {
-    // 第一次打开，初始化地图
-    setTimeout(() => { initMap(); }, 100);
   } else {
-    // 如果地图已存在，刷新尺寸防止显示错位
-    setTimeout(() => { if (lMap) lMap.invalidateSize(); }, 120);
+    console.error("错误：找不到 loadResourcesFromCloud 函数，请检查 resources.js 是否加载。");
+  }
+
+  // --- UI 渲染 ---
+  // 渲染顶部导航栏（包含资源统计和用户状态）
+  if (typeof buildHeader === 'function') {
+    buildHeader();
+  }
+
+  // 渲染侧边栏列表
+  if (typeof buildSidebar === 'function') {
+    buildSidebar();
+  }
+
+  // --- 地图初始化 ---
+  // 如果地图还未创建，则初始化；如果已存在，则刷新尺寸（防止渲染空白）
+  if (typeof initMap === 'function') {
+    if (!window.lMap) {
+      // 给浏览器一点渲染 DOM 的时间，100ms 后初始化地图
+      setTimeout(() => { 
+        initMap(); 
+        console.log("地图初始化完成");
+      }, 100);
+    } else {
+      // 解决 Leaflet 在隐藏容器显示时的尺寸 Bug
+      setTimeout(() => { 
+        window.lMap.invalidateSize(); 
+        console.log("地图尺寸已刷新");
+      }, 120);
+    }
   }
 }
 
-/* ── Header ── */
-function buildHeader(){
-  const cu      = STATE.cu;
-  const pend    = STATE.users.filter(u=>!u.approved).length;
-  const expN    = STATE.resources.filter(r=>r.approved&&(expStatus(r.expDate)==='expired'||expStatus(r.expDate)==='warn')).length;
-  const newLogs = STATE.actLog.filter(l=>!l.seenByAdmin).length;
-  const isAdmin = cu.role === 'admin';
-  const rem     = aiRem(cu.id, cu.role);
-  const remStr  = cu.role!=='admin'
-    ? `<span style="font-size:9px;color:${rem>5?'rgba(52,211,153,.85)':'rgba(239,68,68,.85)'}">(余${rem})</span>`
-    : '';
-
-  $('hdr').innerHTML = `
-    <div class="hdr-brand">◈ RESOURCE ATLAS <span class="ai-tag">AI</span></div>
-    <div class="hdr-spacer"></div>
-
-    ${STATE.adding ? `<span style="font-size:10px;color:var(--gold-light);font-weight:600;flex-shrink:0">▶ 点击地图任意位置标注资源</span>` : ''}
-
-    <button class="btn btn-ai" onclick="openAIMatch()" style="padding:5px 11px;font-size:10px;flex-shrink:0">
-      ✦ AI匹配 ${remStr}
-    </button>
-
-    <button class="btn ${STATE.adding?'btn-amber':'btn-ghost'}" onclick="startAdd()" style="padding:5px 11px;font-size:10px;flex-shrink:0">
-      ${STATE.adding ? '× 取消标注' : '+ 标注资源'}
-    </button>
-
-    ${isAdmin ? `
-      <button class="btn btn-ghost" onclick="openAdmin('stats')" style="padding:5px 10px;font-size:10px;flex-shrink:0">📊 统计</button>
-
-      <button class="btn btn-ghost" onclick="openAdmin('expiry')" style="position:relative;padding:5px 10px;font-size:10px;flex-shrink:0">
-        有效期${expN>0 ? badge(expN) : ''}
-      </button>
-
-      <button class="btn btn-ghost" onclick="openAdmin('users')" style="position:relative;padding:5px 10px;font-size:10px;flex-shrink:0">
-        用户管理${pend>0 ? badge(pend) : ''}
-      </button>
-
-      <button class="btn btn-ghost" onclick="openAdmin('logs')" style="position:relative;padding:5px 10px;font-size:10px;flex-shrink:0">
-        活动日志${newLogs>0 ? badge(newLogs,'var(--purple)') : ''}
-      </button>` : ''}
-
-    <div class="hdr-user">
-      <div class="user-avatar" style="background:rgba(${hr(rc(cu.role))},.2);border-color:${rc(cu.role)};color:${rc(cu.role)}">${cu.name[0]}</div>
-      <div>
-        <div class="user-name">${cu.name}</div>
-        <div class="user-role" style="color:${rc(cu.role)}">${rl(cu.role)}</div>
-      </div>
-      <button class="btn btn-ghost" onclick="doLogout()" style="padding:4px 10px;font-size:10px">退出</button>
-    </div>`;
-}
-
-/* ── Sidebar ── */
-function buildSidebar(){
-  $('sb').innerHTML = `
-    <div class="sb-search">
-      <input class="fi" id="sinp" type="text" placeholder="搜索资源名称或类型..." oninput="renderList()" style="font-size:11px;padding:7px 10px">
-    </div>
-    <div class="sb-chips" id="chips-wrap"></div>
-    <div class="sb-meta">
-      <span class="sb-meta__count" id="cnt"></span>
-      <span class="sb-meta__hint">点击查看详情</span>
-    </div>
-    <div class="sb-list" id="rlist"></div>
-    <div class="sb-legend">
-      <div class="sb-legend__grid">
-        ${Object.entries(CATS).map(([k,v])=>`
-          <div class="sb-legend__item">
-            <span class="sb-legend__dot" style="background:${v.c}"></span>
-            <span class="sb-legend__lbl">${v.l}</span>
-          </div>`).join('')}
-      </div>
-    </div>`;
-  renderChips();
-  renderList();
-}
-
-/* ── Boot ── */
-document.addEventListener('DOMContentLoaded', () => {
-  renderLogin();
+/**
+ * 2. 页面首次加载时的初始化逻辑
+ */
+window.addEventListener('DOMContentLoaded', () => {
+  console.log("系统已就绪，等待登录...");
+  
+  // 默认渲染登录表单
+  if (typeof renderLogin === 'function') {
+    renderLogin();
+  }
 });
+
+/**
+ * 3. 辅助工具函数：快速获取 DOM 元素 (对应代码中的 $ 符号)
+ */
+function $(id) {
+  return document.getElementById(id);
+}
