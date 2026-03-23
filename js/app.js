@@ -1,67 +1,72 @@
 /* ════════════════════════════════════════
-   APP.JS — 界面构建与初始化 (完整恢复版)
+   APP.JS — 暴力修复版 (确保 UI 必显示)
 ════════════════════════════════════════ */
 
-function showApp() {
-  $('lv').style.display = 'none';
-  $('av').style.display = 'flex'; // 使用 flex 布局确保 UI 排版正常
+function $(id) { return document.getElementById(id); }
 
-  // 1. 同步云端资源
+function showApp() {
+  console.log("正在强制渲染 UI...");
+  
+  // 1. 切换视图
+  if ($('lv')) $('lv').style.display = 'none';
+  if ($('av')) $('av').style.display = 'flex';
+
+  // 2. 渲染 UI (即使没有数据也强制渲染)
+  try {
+    buildHeader();
+    buildSidebar();
+  } catch (e) {
+    console.error("渲染 UI 出错:", e);
+  }
+
+  // 3. 加载资源
   if (typeof loadResourcesFromCloud === 'function') {
     loadResourcesFromCloud();
   }
 
-  // 2. 渲染 UI 组件
-  buildHeader();
-  buildSidebar();
-
-  // 3. 初始化地图
+  // 4. 初始化地图
   if (!window.lMap) {
-    setTimeout(() => { initMap(); }, 100);
+    setTimeout(() => { initMap(); }, 200);
   } else {
-    setTimeout(() => { if (window.lMap) window.lMap.invalidateSize(); }, 120);
+    setTimeout(() => { window.lMap.invalidateSize(); }, 250);
   }
 }
 
-// 渲染顶部导航
 function buildHeader() {
-  if (!STATE.cu) return;
-  const cu = STATE.cu;
+  const hdr = $('hdr');
+  if (!hdr) return;
   
-  // 这里的 HTML 决定了你顶部显示的按钮和文字
-  $('hdr').innerHTML = `
-    <div class="hdr-brand">◈ RESOURCE ATLAS <span class="ai-tag">AI</span></div>
-    <div class="hdr-spacer"></div>
-    <div class="u-flex u-items-center u-gap-md">
-      ${STATE.adding ? '<span class="adding-hint">请在地图上点击位置...</span>' : ''}
-      <button class="btn ${STATE.adding ? 'btn-amber' : 'btn-primary'}" onclick="startAdd()">
-        ${STATE.adding ? '取消标注' : '标注新资源'}
-      </button>
-      <div class="user-badge" onclick="doLogout()">
-        <span class="user-name">${cu.name}</span>
-        <span class="logout-icon">退出</span>
-      </div>
+  // 获取用户名，如果没有就显示“管理员”
+  const userName = (STATE.cu && STATE.cu.name) ? STATE.cu.name : "管理员";
+  
+  hdr.innerHTML = `
+    <div class="hdr-brand" style="color:#fff; font-weight:bold; padding:0 15px;">◈ RESOURCE ATLAS</div>
+    <div style="flex:1"></div>
+    <div class="u-flex u-items-center u-gap-md" style="padding-right:15px">
+      <button class="btn btn-primary" onclick="startAdd()" id="addBtn">标注新资源</button>
+      <span style="color:rgba(255,255,255,0.7); font-size:12px; margin:0 10px;">${userName}</span>
+      <button class="btn btn-ghost" onclick="location.reload()" style="font-size:11px">退出</button>
     </div>
   `;
 }
 
-// 渲染侧边栏框架
 function buildSidebar() {
-  $('sb').innerHTML = `
-    <div class="sb-search">
-      <input type="text" id="sinp" class="fi" placeholder="搜索资源名称..." oninput="renderList()">
+  const sb = $('sb');
+  if (!sb) return;
+  
+  sb.innerHTML = `
+    <div style="padding:15px">
+      <input type="text" id="sinp" class="fi" placeholder="搜索资源..." oninput="renderList()" style="width:100%">
+      <div id="chips-wrap" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px"></div>
+      <div id="cnt" style="color:rgba(255,255,255,0.5); font-size:11px; margin-top:15px">正在加载资源...</div>
+      <div id="rlist" style="margin-top:10px; overflow-y:auto; max-height:calc(100vh - 200px)"></div>
     </div>
-    <div id="chips-wrap" class="sb-chips"></div>
-    <div id="cnt" class="sb-count">正在同步云端数据...</div>
-    <div id="rlist" class="sb-list"></div>
-    <div class="sb-footer">DYFTZ 云端同步系统 v4.0</div>
   `;
-  // 渲染分类过滤按钮
+  
   if (typeof renderChips === 'function') renderChips();
+  if (typeof renderList === 'function') renderList();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof renderLogin === 'function') renderLogin();
 });
-
-function $(id) { return document.getElementById(id); }
