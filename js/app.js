@@ -2,7 +2,14 @@
    APP.JS — Application Shell · Header · Sidebar · Init
    Resource Atlas | DYFTZ
 ════════════════════════════════════════ */
-
+// 当用户登录成功后，调用这个函数加载云端资源
+function showApp() {
+  $('lv').style.display='none'; 
+  $('av').style.display='flex';
+  
+  // 【新增这一行】
+  loadResourcesFromCloud(); 
+}
 function showApp(){
   $('lv').style.display = 'none';
   $('av').style.display = 'block';
